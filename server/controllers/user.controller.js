@@ -1,4 +1,3 @@
-import jwt from 'jsonwebtoken'
 import bcryptjs from 'bcryptjs'
 import dotenv from 'dotenv'
 dotenv.config()
@@ -43,7 +42,7 @@ export async function registerUserController(request, response) {
 
     const verifyEmail = await sendEmail({
       sendTo: email,
-      subject: 'Verify email from binkeyit',
+      subject: 'Verify email from blinkit',
       html: verifyEmailTemplate({
         name,
         url: VerifyEmailUrl,
