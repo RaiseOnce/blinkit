@@ -1,5 +1,9 @@
-import UserModel from '../models/user.model.js'
+import jwt from 'jsonwebtoken'
 import bcryptjs from 'bcryptjs'
+import dotenv from 'dotenv'
+dotenv.config()
+import sendEmail from '../config/sendEmail.js'
+import UserModel from '../models/user.model.js'
 import verifyEmailTemplate from '../utils/verifyEmailTemplate.js'
 
 export async function registerUserController(request, response) {
@@ -8,7 +12,7 @@ export async function registerUserController(request, response) {
 
     if (!name || !email || !password) {
       return response.status(400).json({
-        message: 'prvide email, name, password',
+        message: 'provide email, name, password',
         error: true,
         success: false,
       })
@@ -33,14 +37,13 @@ export async function registerUserController(request, response) {
       password: hashPassword,
     }
 
-    const newUser = new UserModel()
+    const newUser = new UserModel(payload)
     const save = await newUser.save()
-
     const VerifyEmailUrl = `${process.env.FRONTEND_URL}/verify-email?code=${save?._id}`
 
     const verifyEmail = await sendEmail({
       sendTo: email,
-      subject: 'Verify email from blinkit',
+      subject: 'Verify email from binkeyit',
       html: verifyEmailTemplate({
         name,
         url: VerifyEmailUrl,
