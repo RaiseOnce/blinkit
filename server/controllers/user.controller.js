@@ -38,6 +38,7 @@ export async function registerUserController(request, response) {
 
     const newUser = new UserModel(payload)
     const save = await newUser.save()
+
     const VerifyEmailUrl = `${process.env.FRONTEND_URL}/verify-email?code=${save?._id}`
 
     const verifyEmail = await sendEmail({
@@ -60,6 +61,38 @@ export async function registerUserController(request, response) {
       message: error.message || error,
       error: true,
       success: false,
+    })
+  }
+}
+
+export async function verifyEmailController(request, response) {
+  try {
+    const { code } = request.body
+    const user = await UserModel.findOne({ _id: code })
+
+    if (!user) {
+      return response.status(400).json({
+        message: 'Invalid code',
+        error: true,
+        success: false,
+      })
+    }
+
+    const updateUser = await UserModel.updateOne(
+      { _id: code },
+      { verify_email: true }
+    )
+
+    return response.json({
+      message: 'Verify email done',
+      success: true,
+      error: false,
+    })
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: true,
     })
   }
 }
